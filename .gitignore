@@ -1,0 +1,26 @@
+# image
+*.png
+*.PNG
+*.jpg
+
+# csv
+*.csv
+
+# ppt
+*.pptx
+
+# data
+000/
+0A0/
+EyeQ/
+images/
+kaggle_notebook/
+model_save/
+runs/
+test/
+train/
+val/
+
+# mis
+.vscode
+__pycache__/
