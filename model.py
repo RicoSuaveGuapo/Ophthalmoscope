@@ -114,8 +114,9 @@ class FundusModel(nn.Module):
         return x
 
 class Attension(nn.Module):
-    def __init__(self, base_model, pt_depth, feature_size):
+    def __init__(self, base_model, pt_depth, feature_size, output_class=5):
         super().__init__()
+        self.outclass = output_class
         # base model parameters should freeze
         self.base_model = base_model
         for name, par in self.base_model.named_parameters():
@@ -127,7 +128,7 @@ class Attension(nn.Module):
         self.attn_3 = nn.Conv2d(in_channels = 16, out_channels= 8, kernel_size=1)
         self.attn_4 = nn.Conv2d(in_channels = 8, out_channels= 1, kernel_size=1)
         self.attn_5 = nn.Conv2d(in_channels = 1, out_channels= pt_depth, kernel_size=1, bias=False)
-        self.attn_5.weight = torch.nn.Parameter(torch.ones(1,pt_depth,feature_size,feature_size))
+        self.attn_5.weight = torch.nn.Parameter(torch.ones(pt_depth,1,1,1))
         self.attn_5.weight.requires_grad = False
         self.act = nn.ReLU()
         self.sig = nn.Sigmoid()
@@ -137,7 +138,7 @@ class Attension(nn.Module):
 
     def attension(self, input):
         x = self.base_feature(input)
-        Bx = nn.BatchNorm2d(x)
+        Bx = nn.BatchNorm2d(x.size(1))(x)
         x = self.drop_1(Bx)
         x = self.act(self.attn_1(x))
         x = self.act(self.attn_2(x))
@@ -146,15 +147,18 @@ class Attension(nn.Module):
         at_x = self.attn_5(x) # linear activation
         x = torch.mul(at_x, Bx)
         gap_features = self.gap(x)
+        gap_features = gap_features.view(-1,gap_features.size(1))
         gap_mask = self.gap(at_x)
+        gap_mask = gap_mask.view(-1, gap_mask.size(1))
 
         return gap_features, gap_mask
 
     def missing(self, gap_features, gap_mask):
         x = gap_features/gap_mask
         x = self.drop_2(x)
-        x = self.drop_2()
-
+        x = x.view(-1, x.size(1))
+        x = self.drop_2(self.act(nn.Linear(x.size(1), 128)(x)))
+        x = nn.Linear(128, self.outclass)(x)
         return x
 
     def forward(self, input):
@@ -167,7 +171,7 @@ if __name__ == '__main__':
     img = torch.randn((1,3,256,256))
     feature_map = model.features(img)
     _, pt_depth, feature_size, _ = feature_map.shape
-    att_model = Attension(base_model=model, pt_depth=pt_depth, feature_size=feature_size)
+    att_model = Attension(base_model=model, pt_depth=pt_depth, feature_size=feature_size, output_class=5)
     
     x = att_model(img)
     print(x)

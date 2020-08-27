@@ -14,7 +14,7 @@ from torchvision.utils import make_grid
 
 from dataset import FundusDataset
 from transform import train_transfrom, test_transfrom
-from model import FundusModel
+from model import FundusModel, Attension
 from loss import WeightFocalLoss
 
 def build_argparse():
@@ -36,6 +36,7 @@ def build_argparse():
     parser.add_argument('--freeze', type=bool, default=False)
     parser.add_argument('--output_class', type=int, default=10)
     parser.add_argument('--grad_acc', type=bool, default=False)
+    parser.add_argument('--attention', type=bool, default=False)
 
     # Loop control
     parser.add_argument('--epoch', type=int, default = 1)
@@ -139,8 +140,18 @@ def main():
 
     # model
     print('-------- Preparing Model --------')
-    model = FundusModel(model_name = args.model_name, hidden_dim=args.hidden_dim, 
-                        activation=args.activation, output_class=args.output_class)
+    if args.attention == False:
+        model = FundusModel(model_name = args.model_name, hidden_dim=args.hidden_dim, 
+                            activation=args.activation, output_class=args.output_class)
+    elif args.attention == True:
+        base_model = FundusModel(model_name = args.model_name, hidden_dim=args.hidden_dim, 
+                            activation=args.activation, output_class=args.output_class)
+        fake_img = torch.randn((1,3,args.image_size,args.image_size)) # to get the dim only
+        feature_map = base_model.features(fake_img)
+        _, pt_depth, feature_size, _ = feature_map.shape
+        model = Attension(base_model=base_model, pt_depth=pt_depth, 
+                        feature_size=feature_size, output_class=args.output_class)
+
     # freeze CNN pretrained model
     if args.freeze:
         freeze_pretrain(model, True)

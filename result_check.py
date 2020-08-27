@@ -72,11 +72,27 @@ if __name__ == '__main__':
     axes.set_yticks(np.arange(0, plotclass-1))
     caxes = axes.matshow(c_matrix, interpolation ='nearest') 
     figure.colorbar(caxes)
+
+    def format_func(value, tick_number):
+        if value == 0:
+            return '01~20'
+        elif value == 1:
+            return '21~40'
+        elif value == 2:
+            return '41~60'
+        elif value == 3:
+            return '61~80'
+        elif value == 4:
+            return '81~100'
+
+    axes.xaxis.set_major_formatter(plt.FuncFormatter(format_func))
+    axes.yaxis.set_major_formatter(plt.FuncFormatter(format_func))
     
     for row_i, row in enumerate(c_matrix):
         for col_i, col in enumerate(row):
             axes.text(col_i-0.3,row_i+0.2,f'{col:.2f}',color='white')
 
     print(f'--- %.1f sec ---' % (time.time() - start_time))
-    plt.savefig(f'confusion_matrix_{mode}.png')
+    plt.savefig(f'confusion_matrix_{mode}_800.png')
+    # plt.show()
     

@@ -9,7 +9,7 @@ Accuracy > 71 %
 3. Confusion matrix (V)
 4. Check age distribution in data set (V)
 5. Check [kaggle notebook](https://www.kaggle.com/c/diabetic-retinopathy-detection/notebooks)
-   1. Attention Model
+   1. Attention Model (-)
 6. Try increase the image resolution with smaller batch size, grad accumulated method
    1. suggest 640,original 800 (V)
 7. Try EficientNet (-)
