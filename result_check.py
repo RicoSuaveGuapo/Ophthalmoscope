@@ -42,14 +42,13 @@ def confusionMatrix(model_path, model_name, mode, output_class, plotclass, image
     return c_matrix
 
 
-
 if __name__ == '__main__':
     start_time = time.time()
-    image_size = 300
+    image_size = 600
     mode = 'val'
     output_class = 5
     plotclass = 5
-    trial = 13
+    trial = 18
     model_name = 'se_resnext101_32x4d'
     # model_name = 'resnet18'
 
@@ -76,8 +75,8 @@ if __name__ == '__main__':
     
     for row_i, row in enumerate(c_matrix):
         for col_i, col in enumerate(row):
-            axes.text(col_i-0.3,row_i+0.2,f'{col:.1f}',color='white')
+            axes.text(col_i-0.3,row_i+0.2,f'{col:.2f}',color='white')
 
     print(f'--- %.1f sec ---' % (time.time() - start_time))
-    plt.savefig('confusion_matrix.png')
+    plt.savefig(f'confusion_matrix_{mode}.png')
     

@@ -11,26 +11,26 @@ Accuracy > 71 %
 5. Check [kaggle notebook](https://www.kaggle.com/c/diabetic-retinopathy-detection/notebooks)
    1. Attention Model
 6. Try increase the image resolution with smaller batch size, grad accumulated method
-   1. suggest 640,original 800 (-)
+   1. suggest 640,original 800 (V)
 7. Try EficientNet (-)
 8. Check train-loss and val-loss (V)
 9. Dataset question: Patients are all sick? (-)
 
 
 ## 8/26
-### Exp16
+### Exp18
 * epoch 15
 * batch_size 8 (grad acc) 
 * image_size 800
 * model se_resnext101_32x4d
 * optim SGD
 * output class: 5
-* loaded model: 14_se_resnext101_32x4d_best.pth
+* loaded model: 16_se_resnext101_32x4d_best.pth (75%)
 * freeze
 Results
-* 
-*  % accuracy
-* save as: `16_se_resnext101_32x4d_best.pth`
+* 11:40:56.4
+* 78.56 % accuracy
+* save as: `18_se_resnext101_32x4d_best.pth`
 
 
 ## 8/24

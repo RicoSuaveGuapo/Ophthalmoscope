@@ -297,3 +297,4 @@ if __name__ == '__main__':
 # python train.py --epoch 15 --batch_size 64 --image_size 300 --model_name se_resnext101_32x4d --load_model_para 8_se_resnext101_32x4d_best.pth --optim 'Adam' --lr 0.000015
 # python train.py --epoch 10 --batch_size 64 --image_size 300 --model_name efficientnet-b0 --optim 'Adam' --freeze True
 # python train.py --epoch 10 --batch_size 64 --image_size 300 --model_name se_resnext101_32x4d --optim 'Adam' --freeze True --output_class 5
+# nohup python train.py --epoch 15 --batch_size 8 --image_size 800 --model_name se_resnext101_32x4d --optim 'SGD' --output_class 5 --grad_acc True --load_model_para 16_se_resnext101_32x4d_best.pth > train.log 2>&1 &
