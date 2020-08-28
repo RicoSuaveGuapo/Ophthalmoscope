@@ -62,6 +62,7 @@ def check_argparse(args):
     assert args.lr_name in ['ReduceLROnPlateau', 'StepLR']
     print('\n---- Training parameters ----')
     print(f'model name: {args.model_name}')
+    print(f'attention : {args.attention}')
     print(f'image size: {args.image_size}')
     print(f'Grad acc  : {args.grad_acc}')
     print(f'Optimizer : {args.optim}')
@@ -86,8 +87,11 @@ def build_train_val_test_dataset(args):
     train_dataloader = DataLoader(train_dataset, pin_memory=True, num_workers=os.cpu_count(),batch_size=args.batch_size, shuffle=True)
     val_dataloader   = DataLoader(val_dataset, pin_memory=True, num_workers=2*os.cpu_count(), batch_size=args.batch_size, shuffle=True)
     test_dataloader   = DataLoader(test_dataset, pin_memory=True, num_workers=2*os.cpu_count(), batch_size=args.batch_size, shuffle=True)
-    weighting = train_dataset.classWeight()
-    return train_dataloader, val_dataloader, test_dataloader, weighting
+    if args.machine == 'server':
+        weighting = train_dataset.classWeight()
+        return train_dataloader, val_dataloader, test_dataloader, weighting
+    else:
+        return train_dataloader, val_dataloader, test_dataloader
 
 def freeze_pretrain(model, freeze=True):
     if freeze:
@@ -135,7 +139,10 @@ def main():
 
     # data
     print('\n-------- Data Preparing --------\n')
-    train_dataloader, val_dataloader, test_dataloader, weighting = build_train_val_test_dataset(args)
+    if args.machine == 'server':
+        train_dataloader, val_dataloader, test_dataloader, weighting = build_train_val_test_dataset(args)
+    else:
+        train_dataloader, val_dataloader, test_dataloader = build_train_val_test_dataset(args)
     print('\n-------- Data Preparing Done! --------\n')
 
     # model
@@ -146,7 +153,8 @@ def main():
     elif args.attention == True:
         base_model = FundusModel(model_name = args.model_name, hidden_dim=args.hidden_dim, 
                             activation=args.activation, output_class=args.output_class)
-        fake_img = torch.randn((1,3,args.image_size,args.image_size)) # to get the dim only
+        base_model = base_model.to(device)
+        fake_img = torch.randn((1,3,args.image_size,args.image_size)).to(device) # to get the dim only
         feature_map = base_model.features(fake_img)
         _, pt_depth, feature_size, _ = feature_map.shape
         model = Attension(base_model=base_model, pt_depth=pt_depth, 
@@ -170,8 +178,11 @@ def main():
     model = model.to(device)
     
     # add in class weighting
-    weighting = torch.tensor(weighting).to(device)
-    criterion = nn.CrossEntropyLoss(weighting)
+    if args.machine == 'server':
+        weighting = torch.tensor(weighting).to(device)
+        criterion = nn.CrossEntropyLoss(weighting)
+    else:
+        criterion = nn.CrossEntropyLoss()
 
     if args.optim == 'Adam':
         # before acc 80 %

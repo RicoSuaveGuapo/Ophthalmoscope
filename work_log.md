@@ -16,6 +16,35 @@ Accuracy > 71 %
 8. Check train-loss and val-loss (V)
 9. Dataset question: Patients are all sick? (-)
 
+## 8/28
+* epoch 15
+* batch_size 16 
+* image_size 300
+* model se_resnext101_32x4d + attension
+* optim Adam
+* output class: 5
+* attension mode inherence freeze se_resnext101_32x4d
+Results
+* 
+* accuracy
+* save as: 
+Comment
+
+## 8/27
+### Exp26
+* epoch 10
+* batch_size 16 
+* image_size 300
+* model se_resnext101_32x4d + attension
+* optim Adam
+* output class: 5
+* attension mode inherence freeze se_resnext101_32x4d
+Results
+* 0:39:37.5
+* 76.23 % accuracy
+* save as: `26_se_resnext101_32x4d_best.pth`
+Comment
+training faster than original fc final two layers, and achieve higher accuracy, and lower image resolution. (Compared with `14_se_resnext101_32x4d_best.pth`)
 
 ## 8/26
 ### Exp18
@@ -26,7 +55,7 @@ Accuracy > 71 %
 * optim SGD
 * output class: 5
 * loaded model: 16_se_resnext101_32x4d_best.pth (75%)
-* freeze
+* unfreeze
 Results
 * 11:40:56.4
 * 78.56 % accuracy

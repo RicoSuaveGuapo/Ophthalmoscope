@@ -116,7 +116,6 @@ class FundusModel(nn.Module):
 class Attension(nn.Module):
     def __init__(self, base_model, pt_depth, feature_size, output_class=5):
         super().__init__()
-        self.outclass = output_class
         # base model parameters should freeze
         self.base_model = base_model
         for name, par in self.base_model.named_parameters():
@@ -135,10 +134,13 @@ class Attension(nn.Module):
         self.drop_1 = nn.Dropout()
         self.drop_2 = nn.Dropout(0.25)
         self.gap = nn.AdaptiveAvgPool2d(1)
+        self.bnor = nn.BatchNorm2d(pt_depth)
+        self.lin_1 = nn.Linear(pt_depth, 128)
+        self.lin_2 = nn.Linear(128, output_class)
 
     def attension(self, input):
         x = self.base_feature(input)
-        Bx = nn.BatchNorm2d(x.size(1))(x)
+        Bx = self.bnor(x)
         x = self.drop_1(Bx)
         x = self.act(self.attn_1(x))
         x = self.act(self.attn_2(x))
@@ -157,8 +159,8 @@ class Attension(nn.Module):
         x = gap_features/gap_mask
         x = self.drop_2(x)
         x = x.view(-1, x.size(1))
-        x = self.drop_2(self.act(nn.Linear(x.size(1), 128)(x)))
-        x = nn.Linear(128, self.outclass)(x)
+        x = self.drop_2(self.act(self.lin_1(x)))
+        x = self.lin_2(x)
         return x
 
     def forward(self, input):
@@ -168,13 +170,16 @@ class Attension(nn.Module):
 
 if __name__ == '__main__':
     model = FundusModel(model_name='se_resnext101_32x4d', hidden_dim=256, output_class=5)
-    img = torch.randn((1,3,256,256))
+    model = model.cuda()
+    img = torch.randn((1,3,256,256)).cuda()
     feature_map = model.features(img)
     _, pt_depth, feature_size, _ = feature_map.shape
     att_model = Attension(base_model=model, pt_depth=pt_depth, feature_size=feature_size, output_class=5)
+
+    att_model = att_model.cuda()
     
     x = att_model(img)
-    print(x)
+    # print(x)
 
     # x = model(img)
     # feature_map = model.features(img)
