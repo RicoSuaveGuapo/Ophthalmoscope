@@ -114,7 +114,7 @@ class FundusModel(nn.Module):
         return x
 
 class Attension(nn.Module):
-    def __init__(self, base_model, pt_depth, feature_size, output_class=5):
+    def __init__(self, base_model, pt_depth, feature_size, output_class=5, freeze=False):
         super().__init__()
         # base model parameters should freeze
         self.base_model = base_model
@@ -128,7 +128,7 @@ class Attension(nn.Module):
         self.attn_4 = nn.Conv2d(in_channels = 8, out_channels= 1, kernel_size=1)
         self.attn_5 = nn.Conv2d(in_channels = 1, out_channels= pt_depth, kernel_size=1, bias=False)
         self.attn_5.weight = torch.nn.Parameter(torch.ones(pt_depth,1,1,1))
-        self.attn_5.weight.requires_grad = False
+        self.attn_5.weight.requires_grad = freeze
         self.act = nn.ReLU()
         self.sig = nn.Sigmoid()
         self.drop_1 = nn.Dropout()

@@ -9,26 +9,51 @@ Accuracy > 71 %
 3. Confusion matrix (V)
 4. Check age distribution in data set (V)
 5. Check [kaggle notebook](https://www.kaggle.com/c/diabetic-retinopathy-detection/notebooks)
-   1. Attention Model (-)
+   1. Attention Model (V)
+   2. use large resolution
 6. Try increase the image resolution with smaller batch size, grad accumulated method
    1. suggest 640,original 800 (V)
 7. Try EficientNet (-)
 8. Check train-loss and val-loss (V)
 9. Dataset question: Patients are all sick? (-)
 
+
 ## 8/28
+
+### Exp32
 * epoch 15
 * batch_size 16 
 * image_size 300
 * model se_resnext101_32x4d + attension
-* optim Adam
+* optim SGD
 * output class: 5
-* attension mode inherence freeze se_resnext101_32x4d
+* loaded model: `31_se_resnext101_32x4d_best.pth`
+* unfreeze
 Results
-* 
-* accuracy
-* save as: 
+* 0:59:12.7
+* 77.81 % accuracy 
+* save as: `32_se_resnext101_32x4d_best.pth`
 Comment
+TODO:
+Seems can keep training?
+
+
+### Exp31
+* epoch 10
+* batch_size 16 
+* image_size 300
+* model se_resnext101_32x4d + attension
+* optim SGD
+* output class: 5
+* loaded model: 18_se_resnext101_32x4d_best.pth
+* freeze se_resnext101 
+Results
+* 0:39:23.3
+* 75.95 % accuracy 
+* save as: `31_se_resnext101_32x4d_best.pth`
+Comment
+Using the best head extractor, to get the freeze result.
+
 
 ## 8/27
 ### Exp26
@@ -38,13 +63,14 @@ Comment
 * model se_resnext101_32x4d + attension
 * optim Adam
 * output class: 5
-* attension mode inherence freeze se_resnext101_32x4d
+* attension mode inherence freeze se_resnext101_32x4d (imagenet pretrained)
 Results
 * 0:39:37.5
 * 76.23 % accuracy
 * save as: `26_se_resnext101_32x4d_best.pth`
 Comment
-training faster than original fc final two layers, and achieve higher accuracy, and lower image resolution. (Compared with `14_se_resnext101_32x4d_best.pth`)
+training faster than original fc final two layers, and achieve higher accuracy, and lower image resolution, training loss converge around 300 iterations, achieve highest accuracy at 7th epoch. (Compared with `14_se_resnext101_32x4d_best.pth`)
+
 
 ## 8/26
 ### Exp18

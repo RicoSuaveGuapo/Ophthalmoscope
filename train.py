@@ -150,28 +150,35 @@ def main():
     if args.attention == False:
         model = FundusModel(model_name = args.model_name, hidden_dim=args.hidden_dim, 
                             activation=args.activation, output_class=args.output_class)
+        # loading previous trained model parameters
+        # usually for freeze-unfreeze method
+        if args.load_model_para:
+            model.load_state_dict(torch.load( os.path.join(machine_path,'model_save', args.load_model_para)))
+        else:
+            pass
     elif args.attention == True:
         base_model = FundusModel(model_name = args.model_name, hidden_dim=args.hidden_dim, 
                             activation=args.activation, output_class=args.output_class)
-        base_model = base_model.to(device)
-        fake_img = torch.randn((1,3,args.image_size,args.image_size)).to(device) # to get the dim only
+        fake_img = torch.randn((1,3,args.image_size,args.image_size)) # to get the dim only
         feature_map = base_model.features(fake_img)
         _, pt_depth, feature_size, _ = feature_map.shape
-        model = Attension(base_model=base_model, pt_depth=pt_depth, 
-                        feature_size=feature_size, output_class=args.output_class)
+        if (args.load_model_para) and (args.freeze):
+            # load in the head CNN, and freeze it
+            base_model.load_state_dict(torch.load(os.path.join(machine_path,'model_save', args.load_model_para)))
+            model = Attension(base_model=base_model, pt_depth=pt_depth, 
+                        feature_size=feature_size, output_class=args.output_class, freeze=args.freeze)
+        elif args.load_model_para:
+            model = Attension(base_model=base_model, pt_depth=pt_depth, 
+                        feature_size=feature_size, output_class=args.output_class, freeze=args.freeze)
+            model.load_state_dict(torch.load(os.path.join(machine_path,'model_save', args.load_model_para)))
+        else:
+            raise IOError('only (1) load head and freeze (2) load all and unfreeze')
 
     # freeze CNN pretrained model
     if args.freeze:
         freeze_pretrain(model, True)
     else:
         freeze_pretrain(model, False)
-
-    # loading previous trained model parameters
-    # usually for freeze-unfreeze method
-    if args.load_model_para:
-        model.load_state_dict(torch.load( os.path.join(machine_path,'model_save', args.load_model_para)))
-    else:
-        pass
     
 
     # pass to CUDA device
@@ -320,3 +327,4 @@ if __name__ == '__main__':
 # python train.py --epoch 10 --batch_size 64 --image_size 300 --model_name efficientnet-b0 --optim 'Adam' --freeze True
 # python train.py --epoch 10 --batch_size 64 --image_size 300 --model_name se_resnext101_32x4d --optim 'Adam' --freeze True --output_class 5
 # nohup python train.py --epoch 15 --batch_size 8 --image_size 800 --model_name se_resnext101_32x4d --optim 'SGD' --output_class 5 --grad_acc True --load_model_para 16_se_resnext101_32x4d_best.pth > train.log 2>&1 &
+# --epoch 15 --batch_size 16 --image_size 300 --model_name se_resnext101_32x4d --optim 'SGD' --output_class 5 --grad_acc True --attention True --freeze False --load_model_para 26_se_resnext101_32x4d_best.pth
