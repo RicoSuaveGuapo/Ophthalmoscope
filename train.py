@@ -164,15 +164,20 @@ def main():
         _, pt_depth, feature_size, _ = feature_map.shape
         if (args.load_model_para) and (args.freeze):
             # load in the head CNN, and freeze it
+            print('-------- Using pre-trained head, and freeze its parameters --------')
             base_model.load_state_dict(torch.load(os.path.join(machine_path,'model_save', args.load_model_para)))
             model = Attension(base_model=base_model, pt_depth=pt_depth, 
                         feature_size=feature_size, output_class=args.output_class, freeze=args.freeze)
         elif args.load_model_para:
+            print('-------- Using pre-trained all, and unfreeze all --------')
             model = Attension(base_model=base_model, pt_depth=pt_depth, 
                         feature_size=feature_size, output_class=args.output_class, freeze=args.freeze)
             model.load_state_dict(torch.load(os.path.join(machine_path,'model_save', args.load_model_para)))
-        else:
-            raise IOError('only (1) load head and freeze (2) load all and unfreeze')
+        else: # args.freeze == True for the case of imagenet pre-trained
+            print('-------- Using pre-trained on ImageNet head, and freeze its parameters --------')
+            model = Attension(base_model=base_model, pt_depth=pt_depth, 
+                        feature_size=feature_size, output_class=args.output_class, freeze=args.freeze)
+            
 
     # freeze CNN pretrained model
     if args.freeze:
