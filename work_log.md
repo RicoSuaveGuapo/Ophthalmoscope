@@ -18,6 +18,54 @@ Accuracy > 71 %
 9. Dataset question: Patients are all sick? (-)
 
 
+## 9/1
+## Exp38
+* epoch 15
+* batch_size 8
+* image_size 800
+* model se_resnext101_32x4d + attension
+* optim Adam
+* output class: 5
+* loaded model: `37_se_resnext101_32x4d_best.pth`
+Results
+* 3:58:39.1
+* 80.70 % accuracy
+* save as: `38_se_resnext101_32x4d_best.pth`
+
+
+## 8/31
+
+### Important Note
+Real freeze at attension after the Exp33
+
+## Exp37
+* epoch 10
+* batch_size 8
+* image_size 800
+* model se_resnext101_32x4d + attension
+* optim Adam
+* output class: 5
+* imagenet pretrained, freeze head
+Results
+* 7:51:46.8
+* 80.04 % accuracy
+* save as: `37_se_resnext101_32x4d_best.pth`
+
+
+### Exp33
+* epoch 10
+* batch_size 16 
+* image_size 800
+* model se_resnext101_32x4d + attension
+* optim Adam
+* output class: 5
+* imagenet pretrained, unfreeze all
+Results
+* 2:33:37.4
+* 78.82 % accuracy
+* save as: `33_se_resnext101_32x4d_best.pth`
+
+
 ## 8/28
 
 ### Exp32
@@ -46,7 +94,7 @@ Seems can keep training?
 * optim SGD
 * output class: 5
 * loaded model: 18_se_resnext101_32x4d_best.pth
-* freeze se_resnext101 
+* freeze se_resnext101 (not really, but freeze attn5)
 Results
 * 0:39:23.3
 * 75.95 % accuracy 

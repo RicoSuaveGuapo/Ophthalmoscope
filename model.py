@@ -120,7 +120,7 @@ class Attension(nn.Module):
         self.base_model = base_model
         for name, par in self.base_model.named_parameters():
             if name.startswith('cnn_model'):
-                par.requires_grad = False
+                par.requires_grad = freeze
         self.base_feature = base_model.features
         self.attn_1 = nn.Conv2d(in_channels = pt_depth, out_channels= 64, kernel_size=1)
         self.attn_2 = nn.Conv2d(in_channels = 64, out_channels= 16, kernel_size=1)
@@ -128,7 +128,7 @@ class Attension(nn.Module):
         self.attn_4 = nn.Conv2d(in_channels = 8, out_channels= 1, kernel_size=1)
         self.attn_5 = nn.Conv2d(in_channels = 1, out_channels= pt_depth, kernel_size=1, bias=False)
         self.attn_5.weight = torch.nn.Parameter(torch.ones(pt_depth,1,1,1))
-        self.attn_5.weight.requires_grad = freeze
+        self.attn_5.weight.requires_grad = False
         self.act = nn.ReLU()
         self.sig = nn.Sigmoid()
         self.drop_1 = nn.Dropout()

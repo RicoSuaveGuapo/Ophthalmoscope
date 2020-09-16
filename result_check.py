@@ -11,7 +11,10 @@ from dataset import FundusDataset
 
 def confusionMatrix(model_path, model_name, mode, output_class, plotclass, image_size, dataset=FundusDataset):
 
-    model = FundusModel(model_name = model_name, output_class=output_class, hidden_dim=256)
+    model = Attension(base_model=base_model, pt_depth=pt_depth, 
+                        feature_size=feature_size, output_class=args.output_class, freeze=args.freeze)
+    model.load_state_dict(torch.load(os.path.join(machine_path,'model_save', args.load_model_para)))
+    
     model.load_state_dict(torch.load(model_path))
     model.eval()
     print('model loaded')
@@ -48,7 +51,7 @@ if __name__ == '__main__':
     mode = 'val'
     output_class = 5
     plotclass = 5
-    trial = 18
+    trial = 38
     model_name = 'se_resnext101_32x4d'
     # model_name = 'resnet18'
 

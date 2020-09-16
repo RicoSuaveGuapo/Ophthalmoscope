@@ -74,15 +74,15 @@ if __name__ == '__main__':
     from utils import UnNormalize
     mode = 'train'
     train_dataset = FundusDataset(mode=mode, transform=True, image_size=256)
-    print(train_dataset.classWeight())
-    # train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=False)
-    # age = torch.Tensor().type(torch.long)
-    # for image, label in train_dataloader:
-        # print(label)
+    # print(train_dataset.classWeight())
+    train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=False)
+    age = torch.Tensor().type(torch.long)
+    for image, label in train_dataloader:
         # image = image.view(-1,256,256)
         # unNormalize = UnNormalize(mean = [0.485, 0.456, 0.406], std = [0.229, 0.224, 0.225])
         # image = unNormalize(image)
         # image = image.numpy().transpose(1,2,0)
         # plt.imshow(image)
         # plt.show()
-        # break
+        age = torch.cat([age, label], 0)
+    print(age)
